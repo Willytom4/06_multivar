@@ -29,7 +29,7 @@ You will first need to watch (and code along with) the following k-means video:
   - On this script, fill your name under the `title` section of the YAML  
   - Go back to the class k-means script, choose a different number of k than what we did in class, and run it.    
 
-```{r, reading data}
+```{r, reading data, warning=FALSE, message=FALSE}
 library(readr)
 library(dplyr)
 library(factoextra)
@@ -39,32 +39,34 @@ weather_norm <- weather %>%
  dplyr:: select(-year, -site, -strength_gtex) %>%
   mutate(across(everything(), ~scale(.x)))
 
-weather_norm
+head(weather_norm)
 ```
 
 # Questions  
 ## 1. What number of k did you select? Why?  
+After trying between 1 to 10 numbers of k (4 exclusive), I selected 3 numbers of k because it appears to be more logical and physically appealing than other numbers tried between 1 and 10.
 ```{r, k means}
 mod_km3 <- kmeans(weather_norm,
                  centers = 3,
                  nstart = 10)
-mod_km3
-
-# After trying between 1 to 10 numbers of k (4 exclusive), I selected 3 numbers of k because it appears to be more logical and physically appealing than other numbers tried between 1 and 10.
+summary(mod_km3)
 ```
 ## 2. How many observations are there in each cluster?  
+There are 337, 108 and 253 observations in clusters 1, 2 and 3, respectively.
+
 ```{r, number of observations}
 weather %>%
   mutate(cluster = mod_km3$cluster) %>%
   group_by(cluster) %>%
   tally()
-
-#There are 337, 108 and 253 observations in cluster 1, 2 and 3, respectively.
 ```
 
 ## 3. Using the `fviz_cluster()` function, import here the original plot with k=4 did in class, and the new plot with the number of k you selected for this exercise. How do they visually compare? Which one seems to be a better choice, and why?  
 
-```{r, kmeans PCA plot}
+(a) Visually, the k means with 4 clusters has four distinct populations while the k means with 3 clusters treated the 4th population as a subset or an outlier of one of the populations even though the populations are clearly distinct. 
+(b) The k means with 4 clusters seems to be the better choice
+(c) The one with the 4 clusters seems to be better based on the distinct populations observed on the plots.
+```{r, kmeans PCA plot, warning=FALSE, message=FALSE}
 library(gridExtra)
 
 mod_km4 <- kmeans(weather_norm,
@@ -80,10 +82,6 @@ plot_mod_km3 <- fviz_cluster(mod_km3,
              main = "k3 cluster")
 
 grid.arrange(plot_mod_km3, plot_mod_km4, ncol = 2)
-
-# (a) Visually, the k means with 4 clusters has four distinct populations while the k means with 3 clusters treated the 4th population as a subset or an outlier of one of the populations even though the populations are clearly distinct. 
-# (b) The k means with 4 clusters seems to be the better choice
-# (c) The one with the 4 clusters seems to be better based on the distinct populations observed on the plots.
 
 ```
 
